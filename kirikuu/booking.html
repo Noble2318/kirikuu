@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Booking Form</title>
+  <style>
+    .error { border-color: #dc3545 !important; }
+    .error-msg { color: #dc3545; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+
+<section id="booking" class="py-5 bg-light">
+  <div class="container">
+    <h2 class="mb-4 text-center">Book Your Stay</h2>
+    <form id="bookingForm" novalidate>
+      <!-- Name & Email -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="name" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+          <div class="error-msg" id="nameError"></div>
+        </div>
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+          <div class="error-msg" id="emailError"></div>
+        </div>
+      </div>
+
+      <!-- Check-in & Check-out -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="checkin" class="form-label">Check-in Date</label>
+          <input type="date" class="form-control" id="checkin" required>
+          <div class="error-msg" id="checkinError"></div>
+        </div>
+        <div class="col-md-6">
+          <label for="checkout" class="form-label">Check-out Date</label>
+          <input type="date" class="form-control" id="checkout" required>
+          <div class="error-msg" id="checkoutError"></div>
+        </div>
+      </div>
+
+      <!-- Room Type -->
+      <div class="mb-3">
+        <label for="room" class="form-label">Room Type</label>
+        <select class="form-select" id="room" required>
+          <option value="" disabled selected>Select a Room</option>
+          <option>Deluxe Suite</option>
+          <option>Standard Room</option>
+          <option>Family Room</option>
+        </select>
+        <div class="error-msg" id="roomError"></div>
+      </div>
+
+      <!-- Special Requests -->
+      <div class="mb-3">
+        <label for="message" class="form-label">Special Requests</label>
+        <textarea class="form-control" id="message" rows="3" placeholder="If you have any preferences..."></textarea>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-success px-4">Submit Booking</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+const form = document.getElementById('bookingForm');
+
+// Fields
+const name = document.getElementById('name');
+const email = document.getElementById('email');
+const checkin = document.getElementById('checkin');
+const checkout = document.getElementById('checkout');
+const room = document.getElementById('room');
+
+// Error elements
+const nameError = document.getElementById('nameError');
+const emailError = document.getElementById('emailError');
+const checkinError = document.getElementById('checkinError');
+const checkoutError = document.getElementById('checkoutError');
+const roomError = document.getElementById('roomError');
+
+const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+// Validation functions
+function validateName() {
+  if(name.value.trim() === '') { name.classList.add('error'); nameError.textContent = "Full Name is required"; return false; }
+  else { name.classList.remove('error'); nameError.textContent = ""; return true; }
+}
+
+function validateEmail() {
+  if(email.value.trim() === '') { email.classList.add('error'); emailError.textContent = "Email is required"; return false; }
+  else if(!email.value.match(emailPattern)) { email.classList.add('error'); emailError.textContent = "Invalid email format"; return false; }
+  else { email.classList.remove('error'); emailError.textContent = ""; return true; }
+}
+
+function validateCheckin() {
+  if(checkin.value === '') { checkin.classList.add('error'); checkinError.textContent = "Check-in date is required"; return false; }
+  else { checkin.classList.remove('error'); checkinError.textContent = ""; return true; }
+}
+
+function validateCheckout() {
+  if(checkout.value === '') { checkout.classList.add('error'); checkoutError.textContent = "Check-out date is required"; return false; }
+  else if(checkout.value <= checkin.value) { checkout.classList.add('error'); checkoutError.textContent = "Check-out must be after check-in"; return false; }
+  else { checkout.classList.remove('error'); checkoutError.textContent = ""; return true; }
+}
+
+function validateRoom() {
+  if(room.value === '') { room.classList.add('error'); roomError.textContent = "Please select a room type"; return false; }
+  else { room.classList.remove('error'); roomError.textContent = ""; return true; }
+}
+
+// Live validation
+name.addEventListener('input', validateName);
+email.addEventListener('input', validateEmail);
+checkin.addEventListener('change', validateCheckin);
+checkout.addEventListener('change', validateCheckout);
+room.addEventListener('change', validateRoom);
+
+// Form submission
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const validations = [
+    {valid: validateName(), field: name},
+    {valid: validateEmail(), field: email},
+    {valid: validateCheckin(), field: checkin},
+    {valid: validateCheckout(), field: checkout},
+    {valid: validateRoom(), field: room}
+  ];
+
+  // Find first invalid field
+  const firstInvalid = validations.find(v => !v.valid);
+  if(firstInvalid) {
+    firstInvalid.field.scrollIntoView({behavior: "smooth", block: "center"});
+    firstInvalid.field.focus();
+  } else {
+    alert("Booking submitted successfully!");
+    form.reset();
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
